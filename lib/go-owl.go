@@ -6,6 +6,7 @@
 //
 // Further information on the Owl Intuition multicast and UDP messages formats can be
 // found on the OWL Intuition support pages.
+//
 // https://theowl.zendesk.com/hc/en-gb/articles/201284603-Multicast-UDP-API-Information
 package owl
 
@@ -49,7 +50,9 @@ type ElecChan struct {
 	PowerUnits  string
 }
 
-// Read takes a byte slice and returns a packet of data or an error
+// Read takes a byte slice and returns an ElecReading containing three channels
+// of data. It returns an empty reading and an error if decoding the byte slice was
+// unsuccessful.
 func Read(b []byte) (ElecReading, error) {
 	elec := ElecReading{}
 
