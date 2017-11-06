@@ -1,53 +1,25 @@
 package main
 
 import (
-	"encoding/xml"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
-	"time"
+
+	"github.com/billglover/go-owl/lib"
 
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-type Signal struct {
-	RSSI int `xml:"rssi,attr"`
-	LQI  int `xml:"lqi,attr"`
-}
-
-type Chan struct {
-	ID     int     `xml:"id,attr"`
-	Power  Reading `xml:"curr"`
-	Energy Reading `xml:"day"`
-}
-
-type Reading struct {
-	Units string  `xml:"units,attr"`
-	Value float64 `xml:",chardata"`
-}
-
-type Battery struct {
-	Level string `xml:"level,attr"`
-}
-
-type ElecReading struct {
-	XMLName  xml.Name `xml:"electricity"`
-	ID       string   `xml:"id,attr"`
-	Time     int64    `xml:"timestamp"`
-	Signal   Signal   `xml:"signal"`
-	Battery  Battery  `xml:"battery"`
-	Channels []Chan   `xml:"chan"`
-}
-
 func main() {
+
 	counter := prometheus.NewCounter(prometheus.CounterOpts{
-		Name:      "reading",
+		Name:      "readings",
 		Subsystem: "electricity",
-		Namespace: "zhujia",
-		Help:      "number of meter readings received",
+		Namespace: "home",
+		Help:      "number of meter readings received since restart",
 	})
 	err := prometheus.Register(counter)
 	if err != nil {
@@ -57,12 +29,45 @@ func main() {
 	powerGauge := prometheus.NewGauge(prometheus.GaugeOpts{
 		Name:      "power",
 		Subsystem: "electricity",
-		Namespace: "zhujia",
+		Namespace: "home",
 		Help:      "instantaneous power consumption",
 	})
 	err = prometheus.Register(powerGauge)
 	if err != nil {
 		log.Fatalf("unable to register power gauge: %v", err)
+	}
+
+	batteryGauge := prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:      "battery",
+		Subsystem: "electricity",
+		Namespace: "home",
+		Help:      "percentage battery remaining",
+	})
+	err = prometheus.Register(batteryGauge)
+	if err != nil {
+		log.Fatalf("unable to register battery gauge: %v", err)
+	}
+
+	rssiGauge := prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:      "rssi",
+		Subsystem: "electricity",
+		Namespace: "home",
+		Help:      "received signal strength indicator",
+	})
+	err = prometheus.Register(rssiGauge)
+	if err != nil {
+		log.Fatalf("unable to register RSSI gauge: %v", err)
+	}
+
+	lqiGauge := prometheus.NewGauge(prometheus.GaugeOpts{
+		Name:      "lqi",
+		Subsystem: "electricity",
+		Namespace: "home",
+		Help:      "link quality indicator",
+	})
+	err = prometheus.Register(lqiGauge)
+	if err != nil {
+		log.Fatalf("unable to register LQI gauge: %v", err)
 	}
 
 	//addr, err := net.ResolveUDPAddr("udp", "224.192.32.19:22600")
@@ -78,42 +83,33 @@ func main() {
 	}
 	defer conn.Close()
 
-	go listen(conn, counter, powerGauge)
+	go listen(conn, counter, powerGauge, batteryGauge, rssiGauge, lqiGauge)
 
 	http.Handle("/metrics", promhttp.Handler())
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func listen(conn *net.UDPConn, counter prometheus.Counter, powerGauge prometheus.Gauge) {
-
-	log.Printf("listening to: %s", conn.LocalAddr())
+func listen(conn *net.UDPConn, counter prometheus.Counter, powerGauge, batteryGauge, rssiGauge, lqiGauge prometheus.Gauge) {
 
 	for {
 		buf := make([]byte, 1024)
 
-		n, addr, err := conn.ReadFromUDP(buf)
-		//fmt.Println("Received ", string(buf[0:n]), " from ", addr)
-
+		n, _, err := conn.ReadFromUDP(buf)
 		if err != nil {
 			fmt.Println("Error: ", err)
 		}
 
-		r := ElecReading{}
-		err = xml.Unmarshal(buf[:n], &r)
+		elec, err := owl.Read(buf[:n])
 		if err != nil {
-			fmt.Println("Error: ", err)
+			fmt.Println(err)
 		}
-		fmt.Println()
-		fmt.Println("ID:", r.ID)
-		fmt.Println("Source:", addr)
-		fmt.Println("Time:", time.Unix(r.Time, 0))
-		fmt.Println("Signal:", r.Signal.RSSI, r.Signal.LQI)
-		fmt.Println("Battery:", r.Battery.Level)
-		fmt.Println("Channel:", r.Channels[0].ID)
-		fmt.Println("Power:", r.Channels[0].Power.Value, r.Channels[0].Power.Units)
-		fmt.Println("Energy:", r.Channels[0].Energy.Value, r.Channels[0].Energy.Units)
+
 		counter.Inc()
-		powerGauge.Set(r.Channels[0].Power.Value)
-	}
+		powerGauge.Set(elec.Chan[0].Power)
+		batteryGauge.Set(elec.Battery)
+		rssiGauge.Set(elec.RSSI)
+		lqiGauge.Set(elec.LQI)
 
+		fmt.Printf("%v : electricity reading : power=%.2f%s\n", elec.Timestamp, elec.Chan[0].Power, elec.Chan[0].PowerUnits)
+	}
 }
