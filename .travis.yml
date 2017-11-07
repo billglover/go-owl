@@ -1,6 +1,6 @@
 language: go
 
-script: go test -v ./...
+script: go test -v -run=. -bench=.
 
 before_deploy:
   - GOOS=linux GOARCH=amd64 go build -o basic-$TRAVIS_TAG-linux-amd64 github.com/billglover/go-owl/examples/basic 
