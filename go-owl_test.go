@@ -1,11 +1,10 @@
 package owl_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
-	"github.com/billglover/go-owl/lib"
+	"github.com/billglover/go-owl"
 )
 
 var elec = []byte(`<electricity id='443719005443'>
@@ -58,7 +57,10 @@ func TestReadElec(t *testing.T) {
 	if reading.Battery != 100.0 {
 		t.Fatalf("unexpected battery level: got %f, want %f", reading.Battery, 100.0)
 	}
+}
 
+func TestReadChannels(t *testing.T) {
+	reading, _ := owl.Read(elec)
 	// test values in the first channel
 	if reading.Chan[0].Power != 305.0 {
 		t.Errorf("unexpected power value: got %f, want %f", reading.Chan[0].Power, 305.0)
@@ -111,7 +113,6 @@ func TestReadWeather(t *testing.T) {
 
 func TestReadInvalid(t *testing.T) {
 	_, err := owl.Read(invalid)
-	fmt.Println("Hi")
 	if err != owl.ErrInvalidPacket {
 		t.Fatalf("unexpected an error when decoding an invalid packet: got %v", err)
 	}
@@ -119,7 +120,6 @@ func TestReadInvalid(t *testing.T) {
 
 func TestReadGarbage(t *testing.T) {
 	_, err := owl.Read(garbage)
-	fmt.Println("Hi")
 	if err != owl.ErrInvalidPacket {
 		t.Fatalf("unexpected an error when decoding a garbage packet: got %v", err)
 	}
