@@ -1,7 +1,7 @@
 # go-owl
 A local listener for the Owl Intuition energy monitor
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/billglover/go-owl)](https://goreportcard.com/report/github.com/billglover/go-owl)
+[![Go Report Card](https://goreportcard.com/badge/github.com/billglover/go-owl)](https://goreportcard.com/report/github.com/billglover/go-owl) [![travis-ci](https://travis-ci.org/billglover/go-owl.svg?branch=master)](https://travis-ci.org/billglover/go-owl.svg?branch=master)
 
 Package owl reads a slice of bytes as broadcast by the Owl Intuition electricity monitor and decodes them into an ElecReading containing three channels of Power and Energy measurements. It also reports battery level, signal strength and timestamp. Although the Owl Intuition broadcasts weather readings these are ignored as they are of limited use. Errors are returned if the byte slice is not decoded successfully.
 
