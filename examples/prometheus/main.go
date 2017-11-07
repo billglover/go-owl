@@ -6,8 +6,7 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/billglover/go-owl/lib"
-
+	owl "github.com/billglover/go-owl"
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -97,6 +96,7 @@ func listen(conn *net.UDPConn, counter prometheus.Counter, powerGauge, batteryGa
 		n, _, err := conn.ReadFromUDP(buf)
 		if err != nil {
 			fmt.Println("Error: ", err)
+			continue
 		}
 
 		elec, err := owl.Read(buf[:n])
