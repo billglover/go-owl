@@ -26,6 +26,19 @@ examples/multicast ▸ ./multicast
 2017-11-07 21:51:32 +0000 GMT : electricity reading : power=402.00w
 ```
 
+## Benchmarks
+
+```plain
+goos: darwin
+goarch: amd64
+pkg: github.com/billglover/go-owl
+BenchmarkRead-8   	   50000	     24739 ns/op
+PASS
+ok  	github.com/billglover/go-owl	1.496s
+```
+
+**Note:** remember, benchmarks allow for relative comparisons as actual performance is system dependence.
+
 ## Contributing
 
 Contributions are welcome. Please leave a comment on an issue if you are going to work on it.

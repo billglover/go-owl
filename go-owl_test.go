@@ -124,3 +124,9 @@ func TestReadGarbage(t *testing.T) {
 		t.Fatalf("unexpected an error when decoding a garbage packet: got %v", err)
 	}
 }
+
+func BenchmarkRead(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		owl.Read(elec)
+	}
+}
