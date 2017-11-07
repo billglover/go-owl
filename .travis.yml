@@ -1,0 +1,33 @@
+language: go
+
+script: go test -v ./...
+
+before_deploy:
+  - GOOS=linux GOARCH=amd64 go build github.com/billglover/go-owl/examples/basic -o basic-$TRAVIS_TAG-linux-amd64
+  - GOOS=linux GOARCH=arm go build github.com/billglover/go-owl/examples/basic -o basic-$TRAVIS_TAG-linux-arm
+  - GOOS=darwin GOARCH=amd64 go build github.com/billglover/go-owl/examples/basic -o basic-$TRAVIS_TAG-darwin-amd64
+  - GOOS=windows GOARCH=amd64 go build github.com/billglover/go-owl/examples/basic -o basic-$TRAVIS_TAG.exe
+  - GOOS=linux GOARCH=amd64 go build github.com/billglover/go-owl/examples/multicast -o multicast-$TRAVIS_TAG-linux-amd64
+  - GOOS=linux GOARCH=arm go build github.com/billglover/go-owl/examples/multicast -o multicast-$TRAVIS_TAG-linux-arm
+  - GOOS=darwin GOARCH=amd64 go build github.com/billglover/go-owl/examples/multicast -o multicast-$TRAVIS_TAG-darwin-amd64
+  - GOOS=windows GOARCH=amd64 go build github.com/billglover/go-owl/examples/multicast -o multicast-$TRAVIS_TAG.exe
+
+deploy:
+  provider: releases
+  api_key: $GITHUB_OAUTH_TOKEN
+  file:
+    - basic-$TRAVIS_TAG-linux-amd64
+    - basic-$TRAVIS_TAG-linux-arm
+    - basic-$TRAVIS_TAG-darwin-amd64
+    - basic-$TRAVIS_TAG.exe
+    - multicast-$TRAVIS_TAG-linux-amd64
+    - multicast-$TRAVIS_TAG-linux-arm
+    - multicast-$TRAVIS_TAG-darwin-amd64
+    - multicast-$TRAVIS_TAG.exe
+
+  skip_cleanup: true
+  on:
+    tags: true
+
+after_deploy:
+  - go clean
