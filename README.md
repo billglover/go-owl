@@ -11,9 +11,9 @@ Full documentation: [godoc.org/github.com/billglover/go-owl](https://godoc.org/g
 
 ## Examples
 
- [ ] *basic* – logs electricity readings to the console
- [ ] *multicast* – similar to `basic` but listens to the multicast address
- [x] *prometheus* – exposes electricty readings as metrics for Prometheus
+ * [ ] *basic* – logs electricity readings to the console
+ * [ ] *multicast* – similar to `basic` but listens to the multicast address
+ * [x] *prometheus* – exposes electricty readings as metrics for Prometheus
 
 ## Contributing
 
