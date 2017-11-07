@@ -11,9 +11,20 @@ Full documentation: [godoc.org/github.com/billglover/go-owl](https://godoc.org/g
 
 ## Examples
 
- * [ ] *basic* – logs electricity readings to the console
- * [ ] *multicast* – similar to `basic` but listens to the multicast address
- * [x] *prometheus* – exposes electricty readings as metrics for Prometheus
+ * [x] *basic* – logs electricity readings to the console
+ * [x] *multicast* – similar to `basic` but listens to the multicast address
+ * [ ] *prometheus* – exposes electricty readings as metrics for Prometheus
+
+To run the basic example:
+
+```bash
+examples/multicast ▸ go build
+examples/multicast ▸ ./multicast
+
+2017-11-07 21:50:44 +0000 GMT : electricity reading : power=434.00w
+2017-11-07 21:50:56 +0000 GMT : electricity reading : power=418.00w
+2017-11-07 21:51:32 +0000 GMT : electricity reading : power=402.00w
+```
 
 ## Contributing
 
