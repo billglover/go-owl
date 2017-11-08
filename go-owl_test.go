@@ -151,6 +151,6 @@ func ExampleRead() {
 		return
 	}
 
-	fmt.Printf("%s power=%.2f energy=%.2f battery=%.2f\n", r.Timestamp, r.Chan[0].Power, r.Chan[0].Energy, r.Battery)
-	// Output: 2017-11-06 06:48:31 +0000 GMT power=305.00 energy=1863.39 battery=100.00
+	fmt.Printf("%s power=%.2f energy=%.2f battery=%.2f\n", r.Timestamp.UTC(), r.Chan[0].Power, r.Chan[0].Energy, r.Battery)
+	// Output: 2017-11-06 06:48:31 +0000 UTC power=305.00 energy=1863.39 battery=100.00
 }
