@@ -36,6 +36,16 @@ var invalid = []byte(`<codequality id='443719005443' code='113'>
 		<text>Poor/Sunny</text>
 	</codequality>`)
 
+var invalidChan = []byte(`<electricity id='443719005443'>
+	<timestamp>1509950911</timestamp>
+	<signal rssi='-68' lqi='48'/>
+	<battery level='80%'/>
+	<chan id='0'>
+		<curr units='w'>305.00</curr>
+		<day units='wh'>1863.39</day>
+	</chan>
+</electricity>`)
+
 var garbage = []byte(`asjfd中文可以吗😂`)
 
 func TestReadElec(t *testing.T) {
@@ -57,6 +67,23 @@ func TestReadElec(t *testing.T) {
 	}
 	if reading.Battery != 100.0 {
 		t.Fatalf("unexpected battery level: got %f, want %f", reading.Battery, 100.0)
+	}
+}
+
+func TestReadInvalidBattery(t *testing.T) {
+	reading, err := owl.Read(invalidBat)
+	if err == nil {
+		t.Errorf("expected an error when decoding invalid battery data, got: %v", err)
+	}
+	if reading.Battery != 0 {
+		t.Errorf("unexpected battery level: got %f, want %f", reading.Battery, 0.0)
+	}
+}
+
+func TestReadInvalidChan(t *testing.T) {
+	_, err := owl.Read(invalidChan)
+	if err == nil {
+		t.Errorf("expected an error when decoding invalid number of channels, got: %v", err)
 	}
 }
 

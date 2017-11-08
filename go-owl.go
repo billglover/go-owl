@@ -13,6 +13,8 @@ package owl
 import (
 	"encoding/xml"
 	"errors"
+	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -122,6 +124,13 @@ func parseElectric(p packet, elec ElecReading) (ElecReading, error) {
 	elec.Battery, _ = strconv.ParseFloat(bl, 64)
 	elec.RSSI = p.Signal.RSSI
 	elec.LQI = p.Signal.LQI
+
+	if len(p.Channels) != 3 {
+		return elec, fmt.Errorf("expected 3 channels, received %d", len(p.Channels))
+	}
+
+	log.Println(len(elec.Chan))
+
 	elec.Chan[0] = ElecChan{
 		Energy:      p.Channels[0].Energy.Value,
 		EnergyUnits: p.Channels[0].Energy.Units,
