@@ -1,6 +1,7 @@
 package owl_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -129,4 +130,22 @@ func BenchmarkRead(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		owl.Read(elec)
 	}
+}
+
+func ExampleRead() {
+	var elec = []byte(`<electricity id='443719005443'>
+		<timestamp>1509950911</timestamp>
+		<signal rssi='-68' lqi='48'/>
+		<battery level='100%'/>
+		<chan id='0'>
+			<curr units='w'>305.00</curr>
+			<day units='wh'>1863.39</day>
+		</chan>
+		<chan id='1'/>
+		<chan id='2'/>
+	</electricity>`)
+
+	r, _ := owl.Read(elec)
+	fmt.Printf("%s power=%.2f energy=%.2f battery=%.2f\n", r.Timestamp, r.Chan[0].Power, r.Chan[0].Energy, r.Battery)
+	// Output: 2017-11-06 06:48:31 +0000 GMT power=305.00 energy=1863.39 battery=100.00
 }
