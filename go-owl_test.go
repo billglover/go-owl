@@ -145,7 +145,12 @@ func ExampleRead() {
 		<chan id='2'/>
 	</electricity>`)
 
-	r, _ := owl.Read(elec)
+	r, err := owl.Read(elec)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	fmt.Printf("%s power=%.2f energy=%.2f battery=%.2f\n", r.Timestamp, r.Chan[0].Power, r.Chan[0].Energy, r.Battery)
 	// Output: 2017-11-06 06:48:31 +0000 GMT power=305.00 energy=1863.39 battery=100.00
 }
