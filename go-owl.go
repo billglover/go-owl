@@ -13,6 +13,8 @@ package owl
 import (
 	"encoding/xml"
 	"errors"
+	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -66,8 +68,8 @@ func Read(b []byte) (ElecReading, error) {
 	case "weather":
 		return elec, ErrWeatherPacket
 	case "electricity":
-		parseElectric(p, &elec)
-		return elec, nil
+		elec, err := parseElectric(p, elec)
+		return elec, err
 	default:
 		return elec, ErrInvalidPacket
 	}
@@ -115,13 +117,25 @@ type reading struct {
 }
 
 // parseElectric populates an ElecReading struct with data from a packet.
-func parseElectric(p packet, elec *ElecReading) {
+func parseElectric(p packet, elec ElecReading) (ElecReading, error) {
 	elec.ID = p.ID
 	elec.Timestamp = time.Unix(p.Time, 0)
-	bl := strings.Replace(p.Battery.Level, "%", "", -1)
-	elec.Battery, _ = strconv.ParseFloat(bl, 64)
+	batStr := strings.Replace(p.Battery.Level, "%", "", -1)
+	bat, err := strconv.ParseFloat(batStr, 64)
+	if err != nil {
+		return elec, fmt.Errorf("unexpected value for battery level: got %s, want <float>%%", p.Battery.Level)
+	}
+	elec.Battery = bat
+
 	elec.RSSI = p.Signal.RSSI
 	elec.LQI = p.Signal.LQI
+
+	if len(p.Channels) != 3 {
+		return elec, fmt.Errorf("expected 3 channels, received %d", len(p.Channels))
+	}
+
+	log.Println(len(elec.Chan))
+
 	elec.Chan[0] = ElecChan{
 		Energy:      p.Channels[0].Energy.Value,
 		EnergyUnits: p.Channels[0].Energy.Units,
@@ -140,4 +154,6 @@ func parseElectric(p packet, elec *ElecReading) {
 		Power:       p.Channels[2].Power.Value,
 		PowerUnits:  p.Channels[2].Power.Units,
 	}
+
+	return elec, nil
 }
