@@ -66,8 +66,8 @@ func Read(b []byte) (ElecReading, error) {
 	case "weather":
 		return elec, ErrWeatherPacket
 	case "electricity":
-		parseElectric(p, &elec)
-		return elec, nil
+		elec, err := parseElectric(p, elec)
+		return elec, err
 	default:
 		return elec, ErrInvalidPacket
 	}
@@ -115,7 +115,7 @@ type reading struct {
 }
 
 // parseElectric populates an ElecReading struct with data from a packet.
-func parseElectric(p packet, elec *ElecReading) {
+func parseElectric(p packet, elec ElecReading) (ElecReading, error) {
 	elec.ID = p.ID
 	elec.Timestamp = time.Unix(p.Time, 0)
 	bl := strings.Replace(p.Battery.Level, "%", "", -1)
@@ -140,4 +140,6 @@ func parseElectric(p packet, elec *ElecReading) {
 		Power:       p.Channels[2].Power.Value,
 		PowerUnits:  p.Channels[2].Power.Units,
 	}
+
+	return elec, nil
 }
