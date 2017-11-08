@@ -36,6 +36,18 @@ var invalid = []byte(`<codequality id='443719005443' code='113'>
 		<text>Poor/Sunny</text>
 	</codequality>`)
 
+var invalidBat = []byte(`<electricity id='443719005443'>
+	<timestamp>1509950911</timestamp>
+	<signal rssi='-68' lqi='48'/>
+	<battery level='abc%'/>
+	<chan id='0'>
+		<curr units='w'>305.00</curr>
+		<day units='wh'>1863.39</day>
+	</chan>
+	<chan id='1'/>
+	<chan id='2'/>
+</electricity>`)
+
 var invalidChan = []byte(`<electricity id='443719005443'>
 	<timestamp>1509950911</timestamp>
 	<signal rssi='-68' lqi='48'/>

@@ -120,8 +120,13 @@ type reading struct {
 func parseElectric(p packet, elec ElecReading) (ElecReading, error) {
 	elec.ID = p.ID
 	elec.Timestamp = time.Unix(p.Time, 0)
-	bl := strings.Replace(p.Battery.Level, "%", "", -1)
-	elec.Battery, _ = strconv.ParseFloat(bl, 64)
+	batStr := strings.Replace(p.Battery.Level, "%", "", -1)
+	bat, err := strconv.ParseFloat(batStr, 64)
+	if err != nil {
+		return elec, fmt.Errorf("unexpected value for battery level: got %s, want <float>%%", p.Battery.Level)
+	}
+	elec.Battery = bat
+
 	elec.RSSI = p.Signal.RSSI
 	elec.LQI = p.Signal.LQI
 
