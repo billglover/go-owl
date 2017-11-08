@@ -73,14 +73,14 @@ func Read(b []byte) (ElecReading, error) {
 	}
 }
 
-// packet represents a single data packet from the Owl Intuition
+// packet represents a single data packet from the Owl Intuition.
 type packet struct {
 	XMLName xml.Name `xml:""`
 	ID      string   `xml:"id,attr"`
 	elecPacket
 }
 
-// elecPacket represents a single packet of electricity data
+// elecPacket represents a single packet of electricity data.
 type elecPacket struct {
 	Time     int64     `xml:"timestamp"`
 	Signal   signal    `xml:"signal"`
@@ -88,33 +88,33 @@ type elecPacket struct {
 	Channels []channel `xml:"chan"`
 }
 
-// signal represents the signal strength at the the Owl Intuition
+// signal represents the signal strength at the the Owl Intuition.
 // receiver
 type signal struct {
 	RSSI float64 `xml:"rssi,attr"`
 	LQI  float64 `xml:"lqi,attr"`
 }
 
-// battery represents the battery level in the Owl Intuition
+// battery represents the battery level in the Owl Intuition.
 // transmitter
 type battery struct {
 	Level string `xml:"level,attr"`
 }
 
-// channel represents a single channel electricity reading
+// channel represents a single channel electricity reading.
 type channel struct {
 	ID     int     `xml:"id,attr"`
 	Power  reading `xml:"curr"`
 	Energy reading `xml:"day"`
 }
 
-// reading represents a single value read from the Owl Intuition
+// reading represents a single value read from the Owl Intuition.
 type reading struct {
 	Units string  `xml:"units,attr"`
 	Value float64 `xml:",chardata"`
 }
 
-// parseElectric populates an ElecReading struct with data from a packet
+// parseElectric populates an ElecReading struct with data from a packet.
 func parseElectric(p packet, elec *ElecReading) {
 	elec.ID = p.ID
 	elec.Timestamp = time.Unix(p.Time, 0)
