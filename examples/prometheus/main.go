@@ -102,6 +102,7 @@ func listen(conn *net.UDPConn, counter prometheus.Counter, powerGauge, batteryGa
 		elec, err := owl.Read(buf[:n])
 		if err != nil {
 			fmt.Println(err)
+			continue
 		}
 
 		counter.Inc()
