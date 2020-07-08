@@ -17,3 +17,5 @@
 examples/basic/basic
 examples/multicast/multicast
 examples/prometheus/prometheus
+examples/wavefront/wavefront
+examples/wavefront/.envrc
